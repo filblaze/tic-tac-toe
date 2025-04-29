@@ -2,34 +2,80 @@ package main;
 
 import java.util.Scanner;
 
+import static main.Board.prepBoard;
+import static main.Board.printBoard;
+import static main.GameData.gameVersion;
+import static main.GameData.input;
+import static main.GameLogic.*;
+import static main.GameLogic5.gameWonO5;
+import static main.GameLogic5.gameWonX5;
+
 public class PlayerConsole {
 
     public static void main(String[] args) {
-        String[] board = new String[9];
-        for(int i=0; i < 9; i++) {
-            board[i] = " ";
-        }
-        GameLogic logic = new GameLogic();
+        Opponent opponent = new Opponent();
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the game of Tac-Toe Player!");
-        System.out.println("|1|2|3|");
-        System.out.println("|4|5|6|");
-        System.out.println("|7|8|9|");
-        String turn = "x";
+        System.out.println("Which game do you want to play?");
+        char [][] board = null;
+        int size;
+        char player = 'X';
 
-        /*System.out.println("Would you like to play again? (Y/N)");
-        System.out.println("Enter your choice: ");*/
-
-        while(logic.gameOver(board)==false) {
-            System.out.println("Is turn of " + turn + ". Enter your choice: ");
-            logic.input(board);
-            logic.printBoard(board);
-            if (turn=="X") {
-                turn = "O";
-            } else {
-                turn = "X";
+        while (board == null) {
+            try {
+                System.out.println("Enter '3' for the 3 point version, enter '5' for the 5 point version:");
+                int input = scanner.nextInt();
+                size = gameVersion(input);
+                board = prepBoard(size);
+            } catch (Exception e) {
+                System.out.println("Invalid input, select again.");
             }
-            System.out.println(board[0] + board[1] + board[2]);
-            logic.gameOver(board);
+        }
+
+        if (board.length == 3) {
+            while (!gameFinished(gameWonX(board), gameWonO(board), boardFull(board))) {
+                printBoard(board);
+                try {
+                    System.out.println("Player " + player + " enter:");
+                    int row = scanner.nextInt() - 1;
+                    int col = scanner.nextInt() - 1;
+                    input(row, col, board, player);
+                    if (boardFull(board)) break;
+                    player = (player == 'X') ? 'O' : 'X';
+                    opponent.inputPC(board.length, board, player);
+                    if (boardFull(board)) break;
+                    player = (player == 'X') ? 'O' : 'X';
+                } catch (Exception e) {
+                    System.out.println("Invalid move. Try again.");
+                }
+            }
+        } else if (board.length == 10) {
+            while (!gameFinished(gameWonX5(board), gameWonO5(board), boardFull(board))) {
+                printBoard(board);
+                try {
+                    System.out.println("Player " + player + " enter:");
+                    int row = scanner.nextInt() - 1;
+                    int col = scanner.nextInt() - 1;
+                    input(row, col, board, player);
+                    if (boardFull(board)) break;
+                    player = (player == 'X') ? 'O' : 'X';
+                    opponent.inputPC(board.length, board, player);
+                    if (boardFull(board)) break;
+                    player = (player == 'X') ? 'O' : 'X';
+                } catch (Exception e) {
+                    System.out.println("Invalid move. Try again.");
+                }
+            }
+        } else {
+            System.out.println("Something went wrong. Restart the game.");
+        }
+        printBoard(board);
+        if (gameWonX(board) || gameWonX5(board)) {
+            System.out.println("Player X won!");
+        } else if (gameWonO(board) || gameWonO5(board)) {
+            System.out.println("Player O won!");
+        } else if (boardFull(board)) {
+            System.out.println("Draw!");
         }
     }
 }
