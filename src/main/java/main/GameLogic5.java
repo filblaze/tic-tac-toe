@@ -58,7 +58,6 @@ public class GameLogic5 {
             for (int col = 0, y = row; y <= board.length - 1; col++, y++) {
                 if (board[col][y] == 'X' && counter < 5) {
                     counter++;
-                    System.out.println(counter);
                 } else if (counter == 5) {
                     winner = true;
                     break;
